@@ -26,17 +26,14 @@ odoo.define("survey_question_type_binary", function (require) {
         },
 
         _prepareSubmitBinaries: async function (params, $binaryField, questionId) {
-            console.log("Binary2");
             params[questionId] = await this._prepareBinaryDatas($binaryField[0].files);
             return params;
         },
 
         _prepareBinaryDatas: async function (files) {
             const array = [];
-            console.log("Binary3");
             for (const file of files) {
                 const dataURL = await this._readFileAsDataURL(file);
-                console.log(dataURL);
                 array.push({
                     filename: file.name,
                     type: file.type,
@@ -44,7 +41,6 @@ odoo.define("survey_question_type_binary", function (require) {
                     data: dataURL.split(",")[1],
                 });
             }
-            console.log(array);
             return array;
         },
 
