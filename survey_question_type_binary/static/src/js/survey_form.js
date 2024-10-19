@@ -10,41 +10,35 @@ odoo.define("survey_question_type_binary", function (require) {
         _prepareSubmitValues: async function (formData, params) {
             this._super(formData, params);
             var self = this;
-            const promises = [];
-            this.$("[data-question-type]").each(function () {
-                switch ($(this).data("questionType")) {
+            for (const el of this.$("[data-question-type]")) {
+                const $el = $(el);
+                switch ($el.data("questionType")) {
                     case "binary":
                     case "multi_binary":
-                        promises.push(
-                            self._prepareSubmitBinaries(
-                                params,
-                                $(this),
-                                $(this).data("name")
-                            )
+                        params = await self._prepareSubmitBinaries(
+                            params,
+                            $el,
+                            $el.data("name")
                         );
                         break;
                 }
-            });
-            await Promise.all(promises);
+            }
         },
 
-        _prepareSubmitBinaries: function (params, $binaryField, questionId) {
+        _prepareSubmitBinaries: async function (params, $binaryField, questionId) {
             console.log("Binary2");
-            return this._prepareBinaryDatas(Object.values($binaryField[0].files)).then(
-                (binaryDatas) => {
-                    params[questionId] = binaryDatas;
-                }
-            );
+            params[questionId] = await this._prepareBinaryDatas($binaryField[0].files);
+            return params;
         },
 
         _prepareBinaryDatas: async function (files) {
             const array = [];
-
             console.log("Binary3");
             for (const file of files) {
                 const dataURL = await this._readFileAsDataURL(file);
+                console.log(dataURL);
                 array.push({
-                    name: file.name,
+                    filename: file.name,
                     type: file.type,
                     size: file.size,
                     data: dataURL.split(",")[1],

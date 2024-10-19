@@ -1,12 +1,16 @@
 # Copyright 2023 Jose Zambudio - Aures Tic <jose@aurestic.es>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from odoo import models
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class SurveyUserInput(models.Model):
     _inherit = "survey.user_input"
 
     def save_lines(self, question, answer, comment=None):
+        _logger.info("# save_lines %s %s %s", question, answer, comment)
         old_answers = self.env["survey.user_input.line"].search(
             [
                 ("user_input_id", "=", self.id),
@@ -16,6 +20,7 @@ class SurveyUserInput(models.Model):
 
         if question.question_type in ("binary", "multi_binary"):
             if not isinstance(answer, (list, tuple)):
+                
                 answer = [answer]
             if not answer:
                 answer = [False]
